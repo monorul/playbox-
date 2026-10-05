@@ -1,0 +1,111 @@
+import { StyleSheet, ScrollView, FlatList, Image, View, TextInput, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+// 1. Setup Dummy Data for the UI
+const CATEGORIES = ['Trending', 'Movie', 'TV', 'TV Channel', 'Cricket', 'Anime'];
+const DUMMY_MOVIES = [
+  { id: '1', title: 'The Vvaan', img: 'https://picsum.photos/seed/1/200/300' },
+  { id: '2', title: 'Ohh My Dog', img: 'https://picsum.photos/seed/2/200/300' },
+  { id: '3', title: 'Hokum', img: 'https://picsum.photos/seed/3/200/300' },
+  { id: '4', title: 'Awarapan 2', img: 'https://picsum.photos/seed/4/200/300' },
+  { id: '5', title: 'Babli', img: 'https://picsum.photos/seed/5/200/300' },
+];
+
+export default function HomeScreen() {
+  // 2. Create the layout for a single movie poster
+  const renderMovie = ({ item }: { item: any }) => (
+    <View style={styles.movieCard}>
+      <Image source={{ uri: item.img }} style={styles.poster} />
+      <ThemedText type="defaultSemiBold" style={styles.movieTitle} numberOfLines={1}>
+        {item.title}
+      </ThemedText>
+    </View>
+  );
+
+  return (
+    <ThemedView style={styles.container}>
+      <SafeAreaView edges={['top']} style={styles.safeArea}>
+        {/* Main Vertical Scroll for the whole page */}
+        <ScrollView showsVerticalScrollIndicator={false}>
+
+          {/* Top Search Bar Header */}
+          <View style={styles.header}>
+            <ThemedText type="title" style={styles.logo}>▶️</ThemedText>
+            <TextInput
+              style={styles.searchBar}
+              placeholder="Search..."
+              placeholderTextColor="#888"
+            />
+            <ThemedText type="defaultSemiBold" style={styles.searchBtn}>Search</ThemedText>
+          </View>
+
+          {/* Horizontal Category Menu */}
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryScroll}>
+            {CATEGORIES.map((cat, index) => (
+              <TouchableOpacity key={index} style={styles.categoryBadge}>
+                <ThemedText style={index === 0 ? styles.activeCategory : styles.inactiveCategory}>
+                  {cat}
+                </ThemedText>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+
+          {/* First Movie Row: Trending Movies */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <ThemedText type="subtitle">Trending Movies</ThemedText>
+              <ThemedText style={styles.seeAll}>All &gt;</ThemedText>
+            </View>
+            <FlatList
+              horizontal
+              data={DUMMY_MOVIES}
+              renderItem={renderMovie}
+              keyExtractor={item => item.id}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.listContainer}
+            />
+          </View>
+
+          {/* Second Movie Row: Gems for you */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <ThemedText type="subtitle">Gems for you</ThemedText>
+              <ThemedText style={styles.seeAll}>All &gt;</ThemedText>
+            </View>
+            <FlatList
+              horizontal
+              data={DUMMY_MOVIES.slice().reverse()} // Reversing data so it looks different
+              renderItem={renderMovie}
+              keyExtractor={item => item.id}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.listContainer}
+            />
+          </View>
+
+        </ScrollView>
+      </SafeAreaView>
+    </ThemedView>
+  );
+}
+
+// 3. Styles to match the dark theme interface
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  safeArea: { flex: 1 },
+  header: { flexDirection: 'row', alignItems: 'center', padding: 16, gap: 12 },
+  logo: { fontSize: 24, color: '#00D1FF' },
+  searchBar: { flex: 1, backgroundColor: '#2A2A2A', borderRadius: 8, padding: 10, color: '#fff' },
+  searchBtn: { color: '#00D1FF' },
+  categoryScroll: { paddingHorizontal: 16, marginBottom: 20 },
+  categoryBadge: { paddingRight: 20 },
+  activeCategory: { fontWeight: 'bold', color: '#fff', fontSize: 16 },
+  inactiveCategory: { color: '#888', fontSize: 16 },
+  section: { marginBottom: 24 },
+  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, marginBottom: 12 },
+  seeAll: { color: '#888', fontSize: 12 },
+  listContainer: { paddingHorizontal: 16, gap: 12 },
+  movieCard: { width: 120 },
+  poster: { width: 120, height: 180, borderRadius: 8, marginBottom: 8, backgroundColor: '#333' },
+  movieTitle: { fontSize: 12 },
+});
